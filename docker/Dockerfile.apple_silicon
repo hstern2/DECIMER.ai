@@ -156,6 +156,10 @@ COPY docker/app/entrypoint-applesilicon.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh && \
     sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
 
+# Docker Desktop's Linux VM may not expose php-fpm's bare "9000" listener over IPv4.
+# Nginx resolves the app service to IPv4, so bind php-fpm there explicitly.
+RUN printf "[www]\nlisten = 0.0.0.0:9000\n" > /usr/local/etc/php-fpm.d/zz-listen-ipv4.conf
+
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
 
